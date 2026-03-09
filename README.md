@@ -1,11 +1,42 @@
-🚀 ESP32: Interrupciones Externas (GPIO) - Práctica 2AEste repositorio contiene la implementación de la Parte A de la Práctica 2, centrada en el uso de Interrupciones Hardware en un microcontrolador ESP32 utilizando el entorno de desarrollo PlatformIO.📝 DescripciónEl objetivo de esta práctica es comprender y aplicar el concepto de interrupciones externas. A diferencia del método Polling (verificación constante), las interrupciones permiten que el procesador reaccione de forma inmediata a eventos electrónicos externos sin desperdiciar ciclos de reloj.En este proyecto, se configura un pulsador para disparar una Rutina de Servicio de Interrupción (ISR) que cuenta el número de pulsaciones y lo muestra por el monitor serie.🛠️ Hardware NecesarioMicrocontrolador: ESP32 (DevKit V1 o similar).Entrada: 1 Pulsador (Push button).Conexión: Cables Jumper y Protoboard.Resistencia: No se requiere externa (se utiliza la interna INPUT_PULLUP del ESP32).🔌 Conexión (Pinout)ComponentePin ESP32ModoPulsador (Terminal 1)GPIO 18Entrada con Pull-up Pulsador (Terminal 2)GNDTierraNota: Al usar FALLING como modo de interrupción, el evento se dispara cuando el pin pasa de un estado ALTO (3.3V) a BAJO (GND) al presionar el botón.💻 Configuración del Software1. RequisitosVS Code con la extensión PlatformIO.2. Archivo de configuración (platformio.ini)Ini, TOML[env:esp32dev]
+# ESP32: Interrupciones Externas mediante GPIO (Práctica 2A)
+
+Este proyecto implementa el uso de interrupciones de hardware en un microcontrolador ESP32 utilizando el entorno de desarrollo PlatformIO y el framework Arduino. [cite_start]El objetivo es capturar eventos externos de forma inmediata sin comprometer el rendimiento del procesador[cite: 1, 3, 53].
+
+## Descripción General
+
+[cite_start]La práctica demuestra la diferencia fundamental entre el método de verificación periódica (Polling) y el uso de interrupciones[cite: 23, 24]. [cite_start]Mientras que el Polling obliga al procesador a consultar constantemente el estado de un pin, la interrupción permite que el procesador ejecute otras tareas y solo atienda el evento cuando se detecta un cambio de señal en el hardware[cite: 14, 25].
+
+
+
+## Especificaciones de Hardware
+
+* [cite_start]**Microcontrolador**: ESP32 DevKit V1 o compatible[cite: 49].
+* [cite_start]**Entrada**: Pulsador físico[cite: 94].
+* [cite_start]**Configuración de Pin**: GPIO 18 configurado como entrada con resistencia interna Pull-up[cite: 102, 110].
+* [cite_start]**Modo de Disparo**: FALLING (se activa cuando la señal pasa de HIGH a LOW)[cite: 66, 111].
+
+## Conexiones Realizadas
+
+* [cite_start]**Terminal 1 del Pulsador**: Conectado al pin GPIO 18 del ESP32[cite: 102].
+* [cite_start]**Terminal 2 del Pulsador**: Conectado al pin GND (Tierra) del ESP32[cite: 94].
+
+
+
+## Estructura del Software
+
+El código utiliza elementos críticos para la gestión eficiente de interrupciones en el ESP32:
+
+* [cite_start]**IRAM_ATTR**: Identificador utilizado en la Rutina de Servicio de Interrupción (ISR) para alojar el código en la memoria RAM interna, acelerando la respuesta del sistema[cite: 73, 77].
+* **attachInterrupt()**: Función que vincula el pin físico con la función de servicio y el modo de disparo[cite: 53, 55].
+* [cite_start]**Control de estado**: Se emplea una estructura para almacenar el número de pulsaciones y un indicador booleano para gestionar la impresión en el bucle principal[cite: 97, 113].
+* [cite_start]**detachInterrupt()**: El programa incluye una función de seguridad que desconecta la interrupción tras 60 segundos de ejecución para liberar recursos[cite: 121, 125].
+
+## Configuración del Proyecto (platformio.ini)
+
+```ini
+[env:esp32dev]
 platform = espressif32
 board = esp32dev
 framework = arduino
 monitor_speed = 115200
-3. Conceptos Clave ImplementadosIRAM_ATTR: Etiqueta que fuerza a la función de interrupción a ejecutarse desde la RAM interna, garantizando una respuesta ultrarrápida.attachInterrupt(): Función que vincula el pin físico con la función lógica (ISR).detachInterrupt(): El código incluye una lógica para desconectar la interrupción automáticamente después de 60 segundos de funcionamiento.🚀 EjecuciónClona este repositorio.Abre el proyecto en VS Code.Conecta tu ESP32.Pulsa en Upload (flecha derecha en la barra inferior).Abre el Serial Monitor (icono del enchufe) a 115200 baudios.Salida EsperadaAl presionar el botón, deberías observar:PlaintextButton 1 has been pressed 1 times
-Button 1 has been pressed 2 times
-...
-Interrupt Detached! (después de 60 segundos)
-📚 ConclusionesEsta implementación demuestra que las interrupciones son esenciales para capturar eventos críticos que el procesador podría ignorar si estuviera ocupado ejecutando otras tareas pesadas o retardos (delay).Desarrollado como parte de la asignatura de Sistemas Embebidos / Microcontroladores.
 
